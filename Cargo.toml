@@ -2,6 +2,8 @@
 name = "cassandra-proto"
 version = "0.1.0"
 authors = ["Alex Pikalov <alex.pikalov.khar@gmail.com>"]
+description = "Cassandra binary protocol primitives"
+license = "MIT"
 edition = "2018"
 
 [features]
