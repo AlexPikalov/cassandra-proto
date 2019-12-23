@@ -2,8 +2,7 @@ use std::cell::RefCell;
 use std::io::{Cursor, Read};
 use std::marker::Unpin;
 
-use async_std::io::Read as AsyncRead;
-use async_std::prelude::*;
+use futures::io::{AsyncRead, AsyncReadExt};
 
 use super::*;
 use crate::compression::Compressor;
