@@ -99,8 +99,6 @@ where
   };
 
   Ok(Some(frame))
-
-  // convert_frame_into_result(frame).map(Option::Some)
 }
 
 pub fn convert_frame_into_result(frame: Frame) -> error::Result<Frame> {

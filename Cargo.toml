@@ -15,8 +15,8 @@ v4 = []
 appveyor = []
 
 [dependencies]
-async-std = "1"
 byteorder = "1"
+futures = "0.3"
 log = "0.4.1"
 rand = "0.4.1"
 snap = "0.2.3"
