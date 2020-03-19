@@ -1,6 +1,6 @@
 [package]
 name = "cassandra-proto"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Alex Pikalov <alex.pikalov.khar@gmail.com>"]
 description = "Cassandra binary protocol primitives"
 license = "MIT"

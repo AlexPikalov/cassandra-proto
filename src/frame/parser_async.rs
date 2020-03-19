@@ -1,9 +1,4 @@
-use std::cell::RefCell;
 use std::io::{Cursor, Read};
-use std::marker::Unpin;
-
-use async_std::io::Read as AsyncRead;
-use async_std::prelude::*;
 
 use super::*;
 use crate::compression::Compressor;
@@ -13,27 +8,39 @@ use crate::frame::FromCursor;
 use crate::types::data_serialization_types::decode_timeuuid;
 use crate::types::{from_bytes, from_u16_bytes, CStringList, UUID_LEN};
 
-pub async fn parse_frame_async<E, C>(
-  cursor_cell: &RefCell<C>,
+macro_rules! proceed_if_filled {
+  ($res: expr, $expected_len: expr) => {
+    if $expected_len > $res? {
+      return Ok(None);
+    }
+  };
+}
+
+pub fn parse_frame_async<E, C>(
+  cursor: &mut C,
   compressor: &dyn Compressor<CompressorError = E>,
-) -> error::Result<Frame>
+) -> error::Result<Option<Frame>>
 where
   E: std::error::Error,
-  C: AsyncRead + Unpin,
+  C: Read,
 {
   let mut version_bytes = [0; Version::BYTE_LENGTH];
   let mut flag_bytes = [0; Flag::BYTE_LENGTH];
   let mut opcode_bytes = [0; Opcode::BYTE_LENGTH];
   let mut stream_bytes = [0; STREAM_LEN];
   let mut length_bytes = [0; LENGTH_LEN];
-  let mut cursor = cursor_cell.borrow_mut();
 
   // NOTE: order of reads matters
-  cursor.read_exact(&mut version_bytes).await?;
-  cursor.read_exact(&mut flag_bytes).await?;
-  cursor.read_exact(&mut stream_bytes).await?;
-  cursor.read_exact(&mut opcode_bytes).await?;
-  cursor.read_exact(&mut length_bytes).await?;
+  proceed_if_filled!(cursor.read(&mut version_bytes), Version::BYTE_LENGTH);
+  println!("version {:?}", version_bytes);
+  proceed_if_filled!(cursor.read(&mut flag_bytes), Flag::BYTE_LENGTH);
+  println!("flag {:?}", flag_bytes);
+  proceed_if_filled!(cursor.read(&mut stream_bytes), STREAM_LEN);
+  println!("stream {:?}", stream_bytes);
+  proceed_if_filled!(cursor.read(&mut opcode_bytes), Opcode::BYTE_LENGTH);
+  println!("opcode {:?}", opcode_bytes);
+  proceed_if_filled!(cursor.read(&mut length_bytes), LENGTH_LEN);
+  println!("length {:?}", length_bytes);
 
   let version = Version::from(version_bytes.to_vec());
   let flags = Flag::get_collection(flag_bytes[0]);
@@ -46,7 +53,7 @@ where
     body_bytes.set_len(length);
   }
 
-  cursor.read_exact(&mut body_bytes).await?;
+  proceed_if_filled!(cursor.read(&mut body_bytes), length);
 
   let full_body = if flags.iter().any(|flag| flag == &Flag::Compression) {
     compressor
@@ -91,10 +98,12 @@ where
     warnings: warnings,
   };
 
-  convert_frame_into_result(frame)
+  Ok(Some(frame))
+
+  // convert_frame_into_result(frame).map(Option::Some)
 }
 
-fn convert_frame_into_result(frame: Frame) -> error::Result<Frame> {
+pub fn convert_frame_into_result(frame: Frame) -> error::Result<Frame> {
   match frame.opcode {
     Opcode::Error => frame.get_body().and_then(|err| match err {
       ResponseBody::Error(err) => Err(error::Error::Server(err)),
