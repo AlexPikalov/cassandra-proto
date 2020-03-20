@@ -32,15 +32,10 @@ where
 
   // NOTE: order of reads matters
   proceed_if_filled!(cursor.read(&mut version_bytes), Version::BYTE_LENGTH);
-  println!("version {:?}", version_bytes);
   proceed_if_filled!(cursor.read(&mut flag_bytes), Flag::BYTE_LENGTH);
-  println!("flag {:?}", flag_bytes);
   proceed_if_filled!(cursor.read(&mut stream_bytes), STREAM_LEN);
-  println!("stream {:?}", stream_bytes);
   proceed_if_filled!(cursor.read(&mut opcode_bytes), Opcode::BYTE_LENGTH);
-  println!("opcode {:?}", opcode_bytes);
   proceed_if_filled!(cursor.read(&mut length_bytes), LENGTH_LEN);
-  println!("length {:?}", length_bytes);
 
   let version = Version::from(version_bytes.to_vec());
   let flags = Flag::get_collection(flag_bytes[0]);
