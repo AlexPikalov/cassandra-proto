@@ -36,11 +36,10 @@ where
     let opcode = Opcode::from(opcode_bytes[0]);
     let length = from_bytes(&length_bytes) as usize;
 
-    let mut body_bytes = Vec::with_capacity(length);
-    unsafe {
-        body_bytes.set_len(length);
-    }
-
+    // FIXME:
+    //   Once a new feature to safely pass an uninitialized buffer to `Read` becomes available,
+    //   we no longer need to zero-initialize `body_bytes` before passing to `Read`.
+    let mut body_bytes = vec![0; length];
     cursor.read_exact(&mut body_bytes)?;
 
     let full_body = if flags.iter().any(|flag| flag == &Flag::Compression) {
