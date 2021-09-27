@@ -43,10 +43,10 @@ where
   let opcode = Opcode::from(opcode_bytes[0]);
   let length = from_bytes(&length_bytes) as usize;
 
-  let mut body_bytes = Vec::with_capacity(length);
-  unsafe {
-    body_bytes.set_len(length);
-  }
+  // FIXME:
+    //   Once a new feature to safely pass an uninitialized buffer to `Read` becomes available,
+    //   we no longer need to zero-initialize `body_bytes` before passing to `Read`.
+  let mut body_bytes = vec![0; length];
 
   proceed_if_filled!(cursor.read(&mut body_bytes), length);
 
@@ -62,10 +62,10 @@ where
   let mut body_cursor = Cursor::new(full_body.as_slice());
 
   let tracing_id = if flags.iter().any(|flag| flag == &Flag::Tracing) {
-    let mut tracing_bytes = Vec::with_capacity(UUID_LEN);
-    unsafe {
-      tracing_bytes.set_len(UUID_LEN);
-    }
+    // FIXME:
+    //   Once a new feature to safely pass an uninitialized buffer to `Read` becomes available,
+    //   we no longer need to zero-initialize `tracing_bytes` before passing to `Read`.
+    let mut tracing_bytes = vec![0; UUID_LEN];
     body_cursor.read_exact(&mut tracing_bytes)?;
 
     decode_timeuuid(tracing_bytes.as_slice()).ok()
