@@ -1,0 +1,33 @@
+name: Testing
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - name: Release
+            cargo_profile: --release
+          - name: Debug
+            cargo_profile:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install latest stable
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+    - name: Build
+      run: cargo build ${{ matrix.cargo_profile }} --all-targets
+    - name: Run tests
+      run: cargo test ${{ matrix.cargo_profile }} -- --include-ignored
