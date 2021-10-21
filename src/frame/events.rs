@@ -486,7 +486,7 @@ mod server_event {
         match event {
             ServerEvent::TopologyChange(ref tc) => {
                 assert_eq!(tc.change_type, TopologyChangeType::NewNode);
-                assert_eq!(format!("{:?}", tc.addr.addr), "V4(127.0.0.1:1)");
+                assert_eq!(tc.addr.addr, "127.0.0.1:1".parse().unwrap());
             }
             _ => panic!("should be topology change event"),
         }
@@ -543,7 +543,7 @@ mod server_event {
         match event {
             ServerEvent::TopologyChange(ref tc) => {
                 assert_eq!(tc.change_type, TopologyChangeType::RemovedNode);
-                assert_eq!(format!("{:?}", tc.addr.addr), "V4(127.0.0.1:1)");
+                assert_eq!(tc.addr.addr, "127.0.0.1:1".parse().unwrap());
             }
             _ => panic!("should be topology change event"),
         }
@@ -588,7 +588,7 @@ mod server_event {
         match event {
             ServerEvent::StatusChange(ref tc) => {
                 assert_eq!(tc.change_type, StatusChangeType::Up);
-                assert_eq!(format!("{:?}", tc.addr.addr), "V4(127.0.0.1:1)");
+                assert_eq!(tc.addr.addr, "127.0.0.1:1".parse().unwrap());
             }
             _ => panic!("should be status change up"),
         }
@@ -635,7 +635,7 @@ mod server_event {
         match event {
             ServerEvent::StatusChange(ref tc) => {
                 assert_eq!(tc.change_type, StatusChangeType::Down);
-                assert_eq!(format!("{:?}", tc.addr.addr), "V4(127.0.0.1:1)");
+                assert_eq!(tc.addr.addr, "127.0.0.1:1".parse().unwrap());
             }
             _ => panic!("should be status change down"),
         }

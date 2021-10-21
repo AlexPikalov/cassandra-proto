@@ -26,17 +26,6 @@ macro_rules! query_values {
 }
 
 #[macro_export]
-macro_rules! builder_opt_field {
-    ($field:ident, $field_type:ty) => {
-        pub fn $field(mut self,
-                          $field: $field_type) -> Self {
-            self.$field = Some($field);
-            self
-        }
-    };
-}
-
-#[macro_export]
 macro_rules! list_as_rust {
     ($($into_type:tt)+) => (
         impl AsRustType<Vec<$($into_type)+>> for List {

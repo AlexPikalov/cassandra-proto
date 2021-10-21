@@ -29,7 +29,11 @@ impl QueryParamsBuilder {
   }
 
   /// Sets new flags.
-  builder_opt_field!(flags, Vec<QueryFlags>);
+  pub fn flags(mut self, flags: Vec<QueryFlags>) -> Self {
+    self.flags = Some(flags);
+
+    self
+  }
 
   /// Sets new values.
   /// Sets new query consistency
@@ -49,7 +53,11 @@ impl QueryParamsBuilder {
   }
 
   /// Sets new with_names parameter value.
-  builder_opt_field!(with_names, bool);
+  pub fn with_names(mut self, with_names: bool) -> Self {
+    self.with_names = Some(with_names);
+
+    self
+  }
 
   /// Sets new values.
   /// Sets new query consistency
@@ -76,10 +84,18 @@ impl QueryParamsBuilder {
   }
 
   /// Sets new serial_consistency value.
-  builder_opt_field!(serial_consistency, Consistency);
+  pub fn serial_consistency(mut self, serial_consistency: Consistency) -> Self {
+    self.serial_consistency = Some(serial_consistency);
+
+    self
+  }
 
   /// Sets new timestamp value.
-  builder_opt_field!(timestamp, i64);
+  pub fn timestamp(mut self, timestamp: i64) -> Self {
+    self.timestamp = Some(timestamp);
+
+    self
+  }
 
   /// Finalizes query building process and returns query itself
   pub fn finalize(self) -> QueryParams {
