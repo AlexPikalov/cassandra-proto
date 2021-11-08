@@ -1,6 +1,7 @@
 #![warn(missing_docs)]
 //! Contains Query Frame related functionality.
 use rand;
+use std::io::Cursor;
 
 use crate::frame::*;
 use crate::consistency::Consistency;
@@ -57,6 +58,18 @@ impl BodyReqQuery {
                                                    paging_state,
                                                    serial_consistency,
                                                    timestamp, }, }
+    }
+}
+
+impl FromCursor for BodyReqQuery {
+    fn from_cursor(cursor: &mut Cursor<&[u8]>) -> error::Result<BodyReqQuery> {
+        let query = CStringLong::from_cursor(cursor)?;
+        let query_params = QueryParams::from_cursor(cursor)?;
+
+        Ok(BodyReqQuery {
+            query,
+            query_params
+        })
     }
 }
 
