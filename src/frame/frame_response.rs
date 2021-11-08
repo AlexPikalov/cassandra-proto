@@ -13,6 +13,8 @@ use crate::frame::frame_authenticate::BodyResAuthenticate;
 use crate::frame::frame_auth_success::BodyReqAuthSuccess;
 use crate::types::rows::Row;
 
+use super::frame_query::BodyReqQuery;
+
 #[derive(Debug)]
 pub enum ResponseBody {
     Error(CDRSError),
@@ -21,7 +23,7 @@ pub enum ResponseBody {
     Authenticate(BodyResAuthenticate),
     Options,
     Supported(BodyResSupported),
-    Query,
+    Query(BodyReqQuery),
     Result(ResResultBody),
     Prepare,
     Execute,
@@ -40,7 +42,7 @@ impl ResponseBody {
             // request frames
             Opcode::Startup => unreachable!(),
             Opcode::Options => unreachable!(),
-            Opcode::Query => unreachable!(),
+            Opcode::Query => ResponseBody::Query(BodyReqQuery::from_cursor(&mut cursor)?),
             Opcode::Prepare => unreachable!(),
             Opcode::Execute => unreachable!(),
             Opcode::Register => unreachable!(),
